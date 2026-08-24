@@ -43,10 +43,22 @@
     document.getElementById("company").value = state.honeypot || "";
     document.getElementById("prev").disabled = index === 0;
     document.getElementById("next").disabled = index === data.screens.length - 1;
+    document.getElementById("screen-jump").value = String(index);
     renderMarkers(screen);
     renderItems(screen, screenState);
     applyImageMode(screen);
     document.getElementById("payload").textContent = backendSessionError;
+  }
+
+  function populateScreenJump() {
+    const jump = document.getElementById("screen-jump");
+    jump.innerHTML = "";
+    data.screens.forEach((screen, screenIndex) => {
+      const option = document.createElement("option");
+      option.value = String(screenIndex);
+      option.textContent = (screenIndex + 1) + ". " + screen.name;
+      jump.appendChild(option);
+    });
   }
 
   function setHumanCheckMessage(message) {
@@ -220,6 +232,14 @@
 
   document.getElementById("prev").addEventListener("click", () => { if (index > 0) { index--; resetMarkersForScreenChange(); render(); } });
   document.getElementById("next").addEventListener("click", () => { if (index < data.screens.length - 1) { index++; resetMarkersForScreenChange(); render(); } });
+  document.getElementById("screen-jump").addEventListener("change", event => {
+    const requestedIndex = Number.parseInt(event.target.value, 10);
+    if (Number.isInteger(requestedIndex) && requestedIndex >= 0 && data && requestedIndex < data.screens.length) {
+      index = requestedIndex;
+      resetMarkersForScreenChange();
+      render();
+    }
+  });
   document.getElementById("screen-ok").addEventListener("change", event => {
     core.currentScreenState(state, data.screens[index].id).ok = event.target.checked;
     saveState();
@@ -257,6 +277,7 @@
     .then(async json => {
       data = json;
       loadState();
+      populateScreenJump();
       renderTurnstile();
       await startBackendSession();
       render();

@@ -30,6 +30,7 @@ main {
 
 nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
 }
@@ -46,6 +47,16 @@ button {
 button:disabled {
   background: #9aa5a1;
   cursor: default;
+}
+
+#screen-jump {
+  border: 0;
+  border-radius: 6px;
+  background: #fff;
+  color: #17201d;
+  max-width: min(46vw, 440px);
+  min-width: 220px;
+  padding: 7px 10px;
 }
 
 #shot-wrap {
@@ -101,7 +112,7 @@ button:disabled {
 }
 
 aside {
-  padding: 16px;
+  padding: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -117,24 +128,54 @@ aside {
 }
 
 h1 {
-  font-size: 24px;
+  font-size: 21px;
   line-height: 1.2;
-  margin: 0 0 12px;
+  margin: 0 0 8px;
 }
 
 label {
   display: flex;
   gap: 8px;
   align-items: center;
-  margin: 10px 0;
+  margin: 6px 0;
+}
+
+.review-controls {
+  margin-bottom: 6px;
+}
+
+.reviewer-field {
+  margin: 0 0 6px;
+}
+
+.reviewer-field span {
+  font-weight: 700;
+}
+
+.reviewer-field input {
+  flex: 1;
+  min-width: 0;
+}
+
+.toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.toggle-row label {
+  font-size: 13px;
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .human-check {
   border: 1px solid #b9c4bf;
   background: #eef4f1;
   border-radius: 6px;
-  padding: 10px;
-  margin: 10px 0 12px;
+  padding: 8px;
+  margin: 6px 0 8px;
 }
 
 .human-check.attention {
@@ -145,7 +186,7 @@ label {
 .human-check strong {
   display: block;
   font-size: 13px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .inline-error {
@@ -163,11 +204,11 @@ label {
 .notes-field span {
   display: block;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .notes-field textarea {
-  min-height: 72px;
+  min-height: 56px;
 }
 
 .item {
@@ -230,5 +271,10 @@ textarea {
 
   aside {
     min-height: 55vh;
+  }
+
+  #screen-jump {
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 }

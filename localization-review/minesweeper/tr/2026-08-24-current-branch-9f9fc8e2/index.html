@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Localization Review Kit</title>
-  <link rel="stylesheet" href="styles.css?v=1">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
   <header>
@@ -15,6 +15,7 @@
     <nav>
       <button id="prev" type="button">Previous</button>
       <button id="next" type="button">Next</button>
+      <select id="screen-jump" aria-label="Jump to screen"></select>
       <button id="submit" type="button">Submit Review</button>
     </nav>
   </header>
@@ -27,10 +28,14 @@
     </section>
     <aside>
       <h1 id="screen-title"></h1>
-      <label><span>Reviewer</span><input id="reviewer" autocomplete="name"></label>
-      <label><input id="screen-ok" type="checkbox"> <span>Screen OK</span></label>
-      <label><input id="image-original" type="checkbox"> <span>Original image size</span></label>
-      <label><input id="show-markers" type="checkbox" checked> <span>Show numbers</span></label>
+      <section class="review-controls">
+        <label class="reviewer-field"><span>Reviewer</span><input id="reviewer" autocomplete="name"></label>
+        <div class="toggle-row">
+          <label><input id="screen-ok" type="checkbox"> <span>Screen OK</span></label>
+          <label><input id="image-original" type="checkbox"> <span>Original size</span></label>
+          <label><input id="show-markers" type="checkbox" checked> <span>Numbers</span></label>
+        </div>
+      </section>
       <section id="human-check" class="human-check">
         <strong>Human verification</strong>
         <div id="turnstile-container"></div>
@@ -45,6 +50,6 @@
   <script src="backend-config.js"></script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
   <script src="reviewer-core.js"></script>
-  <script src="reviewer.js?v=2"></script>
+  <script src="reviewer.js?v=3"></script>
 </body>
 </html>
