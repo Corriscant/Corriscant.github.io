@@ -32,7 +32,7 @@
     const screenState = core.currentScreenState(state, screen.id);
     document.getElementById("campaign").textContent = data.campaignId + " / " + data.localeCode;
     document.getElementById("progress").textContent = (index + 1) + " of " + data.screens.length;
-    document.getElementById("screen-title").textContent = screen.name;
+    document.getElementById("screen-title").textContent = screen.name + " (" + (index + 1) + " of " + data.screens.length + ")";
     document.getElementById("screenshot").src = screen.screenshotPath;
     document.getElementById("screen-ok").checked = !!screenState.ok;
     document.getElementById("image-original").checked = core.normalizeImageMode(state.imageMode) === "original";
