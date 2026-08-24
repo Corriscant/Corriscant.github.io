@@ -5,10 +5,12 @@
   let index = 0;
   let state = {};
   let turnstileToken = "";
+  let turnstileWidgetId = null;
   let backendSessionError = "";
   let markersVisible = true;
-  let submissionComplete = false;
   let submissionInFlight = false;
+  let submitCooldownTimerId = 0;
+  const ResubmitCooldownMs = 30000;
   const humanVerificationRequiredMessage = "Please complete Human verification, then press Submit Review again.";
 
   function loadState() {
@@ -23,7 +25,16 @@
       state.startedAtClientUtc = new Date().toISOString();
     }
 
+    if (!state.submissionId) {
+      state.submissionId = core.createSubmissionId();
+    }
+
+    if (!Number.isFinite(Number(state.submitCooldownUntilMs))) {
+      state.submitCooldownUntilMs = 0;
+    }
+
     state.imageMode = core.normalizeImageMode(state.imageMode);
+    saveState();
   }
 
   function saveState() {
@@ -50,6 +61,7 @@
     renderItems(screen, screenState);
     applyImageMode(screen);
     setSubmitStatus(backendSessionError, backendSessionError ? "error" : "");
+    updateSubmitButtonState();
   }
 
   function setSubmitStatus(message, kind) {
@@ -59,9 +71,67 @@
   }
 
   function setSubmitBusy(isBusy) {
+    submissionInFlight = isBusy;
+    updateSubmitButtonState();
+  }
+
+  function updateSubmitButtonState() {
     const button = document.getElementById("submit");
-    button.disabled = isBusy;
-    button.textContent = isBusy ? "Submitting..." : "Submit Review";
+    if (submissionInFlight) {
+      button.disabled = true;
+      button.textContent = "Submitting...";
+      return;
+    }
+
+    const remainingSeconds = cooldownRemainingSeconds();
+    if (remainingSeconds > 0) {
+      button.disabled = true;
+      button.textContent = "Submit Review (" + remainingSeconds + "s)";
+      return;
+    }
+
+    button.disabled = false;
+    button.textContent = "Submit Review";
+  }
+
+  function cooldownRemainingSeconds() {
+    return Math.max(0, Math.ceil(cooldownRemainingMs() / 1000));
+  }
+
+  function cooldownRemainingMs() {
+    return Math.max(0, Number(state.submitCooldownUntilMs || 0) - Date.now());
+  }
+
+  function startSubmitCooldown(milliseconds) {
+    state.submitCooldownUntilMs = Date.now() + milliseconds;
+    saveState();
+    scheduleSubmitCooldownTimer();
+    updateSubmitButtonState();
+  }
+
+  function scheduleSubmitCooldownTimer() {
+    if (submitCooldownTimerId) {
+      window.clearInterval(submitCooldownTimerId);
+      submitCooldownTimerId = 0;
+    }
+
+    if (cooldownRemainingMs() <= 0) {
+      state.submitCooldownUntilMs = 0;
+      saveState();
+      updateSubmitButtonState();
+      return;
+    }
+
+    submitCooldownTimerId = window.setInterval(() => {
+      if (cooldownRemainingMs() <= 0) {
+        window.clearInterval(submitCooldownTimerId);
+        submitCooldownTimerId = 0;
+        state.submitCooldownUntilMs = 0;
+        saveState();
+      }
+
+      updateSubmitButtonState();
+    }, 1000);
   }
 
   function populateScreenJump() {
@@ -191,7 +261,7 @@
       return;
     }
 
-    window.turnstile.render("#turnstile-container", {
+    turnstileWidgetId = window.turnstile.render("#turnstile-container", {
       sitekey: backendConfig.turnstileSiteKey,
       callback: token => {
         turnstileToken = token;
@@ -207,16 +277,27 @@
     });
   }
 
-  async function submitPayload() {
-    if (submissionComplete) {
-      const result = { ok: true, alreadySubmitted: true };
-      setSubmitStatus("Review already submitted. Thank you.", "success");
-      return result;
+  function resetTurnstile() {
+    turnstileToken = "";
+    if (!window.turnstile || turnstileWidgetId === null || typeof window.turnstile.reset !== "function") {
+      return;
     }
 
+    window.turnstile.reset(turnstileWidgetId);
+  }
+
+  async function submitPayload() {
     if (submissionInFlight) {
       const result = { ok: false, pending: true };
       setSubmitStatus("Review submission is already in progress.", "info");
+      return result;
+    }
+
+    const remainingSeconds = cooldownRemainingSeconds();
+    if (remainingSeconds > 0) {
+      const result = { ok: false, retryAfterSeconds: remainingSeconds };
+      setSubmitStatus("Please wait " + remainingSeconds + " seconds before submitting again.", "info");
+      updateSubmitButtonState();
       return result;
     }
 
@@ -257,18 +338,27 @@
       });
       const body = await response.json();
       if (!response.ok) {
-        throw new Error(body.error || "Submission failed");
+        const error = new Error(body.error || "Submission failed");
+        error.retryAfterSeconds = Number(body.retryAfterSeconds || 0);
+        throw error;
       }
 
-      submissionComplete = true;
-      setSubmitStatus("Review submitted. Thank you.", "success");
+      setSubmitStatus("Review submitted. You can send updates in 30 seconds.", "success");
+      startSubmitCooldown(ResubmitCooldownMs);
       return body;
     } catch (error) {
+      if (Number.isFinite(error.retryAfterSeconds) && error.retryAfterSeconds > 0) {
+        startSubmitCooldown(error.retryAfterSeconds * 1000);
+        const retryMessage = "Please wait " + Math.ceil(error.retryAfterSeconds) + " seconds before submitting again.";
+        setSubmitStatus(retryMessage, "error");
+        return { error: retryMessage, details: error.message };
+      }
+
       const message = "Review could not be submitted. Please try again.";
       setSubmitStatus(message, "error");
       return { error: message, details: error.message };
     } finally {
-      submissionInFlight = false;
+      resetTurnstile();
       setSubmitBusy(false);
     }
   }
@@ -324,6 +414,7 @@
       renderTurnstile();
       await startBackendSession();
       render();
+      scheduleSubmitCooldownTimer();
     })
     .catch(error => {
       setSubmitStatus("The review package could not be loaded. Please refresh the page and try again.", "error");

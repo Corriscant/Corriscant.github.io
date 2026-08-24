@@ -5,8 +5,10 @@
   function createEmptyState(startedAtClientUtc) {
     return {
       reviewerName: "",
+      submissionId: "",
       sessionId: "",
       startedAtClientUtc: startedAtClientUtc || new Date().toISOString(),
+      submitCooldownUntilMs: 0,
       imageMode: "fit",
       screens: {},
       honeypot: ""
@@ -86,7 +88,7 @@
     });
 
     return {
-      submissionId: settings.submissionId || createSubmissionId(),
+      submissionId: settings.submissionId || state.submissionId || createSubmissionId(),
       campaignId: data.campaignId,
       manifestHash: data.manifestHash,
       localeCode: data.localeCode,
@@ -160,6 +162,7 @@
 
   global.LocalizationReviewKitReviewer = {
     createEmptyState: createEmptyState,
+    createSubmissionId: createSubmissionId,
     storageKey: storageKey,
     currentScreenState: currentScreenState,
     markerPositionPercent: markerPositionPercent,
