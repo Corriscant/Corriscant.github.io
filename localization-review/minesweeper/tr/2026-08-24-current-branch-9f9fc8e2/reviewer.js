@@ -6,6 +6,7 @@
   let state = {};
   let turnstileToken = "";
   let backendSessionError = "";
+  let markersVisible = true;
 
   function loadState() {
     const raw = localStorage.getItem(core.storageKey(data));
@@ -35,6 +36,7 @@
     document.getElementById("screenshot").src = screen.screenshotPath;
     document.getElementById("screen-ok").checked = !!screenState.ok;
     document.getElementById("image-original").checked = core.normalizeImageMode(state.imageMode) === "original";
+    document.getElementById("show-markers").checked = markersVisible;
     document.getElementById("screen-notes").value = screenState.notes || "";
     document.getElementById("reviewer").value = state.reviewerName || "";
     document.getElementById("company").value = state.honeypot || "";
@@ -79,6 +81,7 @@
   function renderMarkers(screen) {
     const layer = document.getElementById("marker-layer");
     layer.innerHTML = "";
+    layer.hidden = !markersVisible;
     screen.items.forEach(item => {
       const marker = document.createElement("div");
       const position = core.markerPositionPercent(item, screen);
@@ -88,6 +91,10 @@
       marker.style.top = position.top + "%";
       layer.appendChild(marker);
     });
+  }
+
+  function resetMarkersForScreenChange() {
+    markersVisible = true;
   }
 
   function renderItems(screen, screenState) {
@@ -185,8 +192,8 @@
     return body;
   }
 
-  document.getElementById("prev").addEventListener("click", () => { if (index > 0) { index--; render(); } });
-  document.getElementById("next").addEventListener("click", () => { if (index < data.screens.length - 1) { index++; render(); } });
+  document.getElementById("prev").addEventListener("click", () => { if (index > 0) { index--; resetMarkersForScreenChange(); render(); } });
+  document.getElementById("next").addEventListener("click", () => { if (index < data.screens.length - 1) { index++; resetMarkersForScreenChange(); render(); } });
   document.getElementById("screen-ok").addEventListener("change", event => {
     core.currentScreenState(state, data.screens[index].id).ok = event.target.checked;
     saveState();
@@ -195,6 +202,10 @@
     state.imageMode = event.target.checked ? "original" : "fit";
     saveState();
     applyImageMode(data.screens[index]);
+  });
+  document.getElementById("show-markers").addEventListener("change", event => {
+    markersVisible = event.target.checked;
+    renderMarkers(data.screens[index]);
   });
   document.getElementById("screen-notes").addEventListener("input", event => {
     core.currentScreenState(state, data.screens[index].id).notes = event.target.value;
