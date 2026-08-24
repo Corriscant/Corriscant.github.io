@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Localization Review Kit</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div>
+      <strong id="campaign">Localization Review Kit</strong>
+      <span id="progress"></span>
+    </div>
+    <nav>
+      <button id="prev" type="button">Previous</button>
+      <button id="next" type="button">Next</button>
+      <button id="submit" type="button">Build Payload</button>
+    </nav>
+  </header>
+  <main>
+    <section id="shot-wrap" class="fit">
+      <div id="shot-frame">
+        <img id="screenshot" alt="">
+        <div id="marker-layer"></div>
+      </div>
+    </section>
+    <aside>
+      <h1 id="screen-title"></h1>
+      <label><span>Reviewer</span><input id="reviewer" autocomplete="name"></label>
+      <label><input id="screen-ok" type="checkbox"> <span>Screen OK</span></label>
+      <label><input id="image-original" type="checkbox"> <span>Original image size</span></label>
+      <label class="notes-field"><span>Notes</span><textarea id="screen-notes" placeholder="Screen-level notes"></textarea></label>
+      <input id="company" class="hp" autocomplete="off" tabindex="-1" aria-hidden="true">
+      <div id="items"></div>
+      <div id="turnstile-container"></div>
+      <pre id="payload"></pre>
+    </aside>
+  </main>
+  <script src="backend-config.js"></script>
+  <script src="reviewer-core.js"></script>
+  <script src="reviewer.js"></script>
+</body>
+</html>
