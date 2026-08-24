@@ -129,6 +129,33 @@ label {
   margin: 10px 0;
 }
 
+.human-check {
+  border: 1px solid #b9c4bf;
+  background: #eef4f1;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 10px 0 12px;
+}
+
+.human-check.attention {
+  border-color: #c73d35;
+  background: #fff0ee;
+}
+
+.human-check strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.inline-error {
+  color: #9f2721;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-top: 8px;
+}
+
 .notes-field {
   display: block;
 }

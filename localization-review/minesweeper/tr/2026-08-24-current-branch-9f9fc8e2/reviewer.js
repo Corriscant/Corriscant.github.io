@@ -7,6 +7,7 @@
   let turnstileToken = "";
   let backendSessionError = "";
   let markersVisible = true;
+  const humanVerificationRequiredMessage = "Please complete Human verification, then press Submit Review again.";
 
   function loadState() {
     const raw = localStorage.getItem(core.storageKey(data));
@@ -46,6 +47,16 @@
     renderItems(screen, screenState);
     applyImageMode(screen);
     document.getElementById("payload").textContent = backendSessionError;
+  }
+
+  function setHumanCheckMessage(message) {
+    const panel = document.getElementById("human-check");
+    const messageNode = document.getElementById("human-check-message");
+    messageNode.textContent = message || "";
+    panel.classList.toggle("attention", !!message);
+    if (message) {
+      panel.scrollIntoView({ block: "nearest" });
+    }
   }
 
   function applyImageMode(screen) {
@@ -158,11 +169,26 @@
       sitekey: backendConfig.turnstileSiteKey,
       callback: token => {
         turnstileToken = token;
+        setHumanCheckMessage("");
+      },
+      "expired-callback": () => {
+        turnstileToken = "";
+      },
+      "error-callback": () => {
+        turnstileToken = "";
+        setHumanCheckMessage("Human verification is unavailable. Please refresh the page and try again.");
       }
     });
   }
 
   async function submitPayload() {
+    if (backendConfig.apiBaseUrl && backendConfig.turnstileSiteKey && !turnstileToken) {
+      const error = { error: humanVerificationRequiredMessage };
+      setHumanCheckMessage(humanVerificationRequiredMessage);
+      document.getElementById("payload").textContent = JSON.stringify(error, null, 2);
+      return error;
+    }
+
     const payload = core.buildSubmissionPayload(data, state, {
       turnstileToken: turnstileToken
     });
