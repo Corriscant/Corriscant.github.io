@@ -15,6 +15,7 @@
       "screens": 35,
       "reviewItems": 262,
       "path": "tr/2026-08-24-current-branch-9f9fc8e2/",
+      "adminPath": "tr/2026-08-24-current-branch-9f9fc8e2/admin.html",
       "notes": "First public draft package for Turkish localization review. Cloudflare Worker/D1 submission backend is configured."
     }
   ]
