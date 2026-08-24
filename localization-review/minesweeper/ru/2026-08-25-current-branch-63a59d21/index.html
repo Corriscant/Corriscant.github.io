@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Localization Review Kit</title>
+  <link rel="stylesheet" href="styles.css?v=4">
+</head>
+<body>
+  <header>
+    <div>
+      <strong id="campaign">Localization Review Kit</strong>
+      <span id="progress"></span>
+    </div>
+    <nav>
+      <button id="prev" type="button">Previous</button>
+      <button id="next" type="button">Next</button>
+      <select id="screen-jump" aria-label="Jump to screen"></select>
+      <button id="submit" type="button">Submit Review</button>
+      <a class="nav-link" href="admin.html">View Results</a>
+    </nav>
+  </header>
+  <main>
+    <section id="shot-wrap" class="fit">
+      <div id="shot-frame">
+        <img id="screenshot" alt="">
+        <div id="marker-layer"></div>
+      </div>
+    </section>
+    <aside>
+      <h1 id="screen-title"></h1>
+      <section class="review-controls">
+        <label class="reviewer-field"><span>Reviewer</span><input id="reviewer" autocomplete="name"></label>
+        <div class="toggle-row">
+          <label><input id="screen-ok" type="checkbox"> <span>Screen OK</span></label>
+          <label><input id="image-original" type="checkbox"> <span>Original size</span></label>
+          <label><input id="show-markers" type="checkbox" checked> <span>Numbers</span></label>
+        </div>
+      </section>
+      <section id="human-check" class="human-check">
+        <strong>Human verification</strong>
+        <div id="turnstile-container"></div>
+        <div id="human-check-message" class="inline-error" role="status"></div>
+      </section>
+      <label class="notes-field"><span>Notes</span><textarea id="screen-notes" placeholder="Screen-level notes"></textarea></label>
+      <input id="company" class="hp" autocomplete="off" tabindex="-1" aria-hidden="true">
+      <div id="items"></div>
+      <div id="payload" class="submit-status" role="status"></div>
+    </aside>
+  </main>
+  <script src="backend-config.js"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
+  <script src="reviewer-core.js?v=2"></script>
+  <script src="reviewer.js?v=8"></script>
+</body>
+</html>

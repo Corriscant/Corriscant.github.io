@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "publicCampaignId": "minesweeper-ru-20260825-current-branch-63a59d21",
+  "packageCampaignId": "minesweeper-ru-20260825-current-branch-63a59d21",
+  "locale": "ru",
+  "language": "Russian",
+  "status": "draft",
+  "submissionStatus": "backend-ready",
+  "source": {
+    "gameCommit": "63a59d21",
+    "generationWorktree": "C:\\Users\\Dell\\.codex\\worktrees\\23de\\Minesweeper"
+  },
+  "package": {
+    "screens": 35,
+    "reviewItems": 262,
+    "internalCampaignId": "minesweeper-ru-20260825-current-branch-63a59d21",
+    "contactSheet": "current-branch-contact-sheet.png"
+  }
+}
+
