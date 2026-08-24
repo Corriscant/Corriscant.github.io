@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Localization Review Kit</title>
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <header>
@@ -44,12 +44,12 @@
       <label class="notes-field"><span>Notes</span><textarea id="screen-notes" placeholder="Screen-level notes"></textarea></label>
       <input id="company" class="hp" autocomplete="off" tabindex="-1" aria-hidden="true">
       <div id="items"></div>
-      <pre id="payload"></pre>
+      <div id="payload" class="submit-status" role="status"></div>
     </aside>
   </main>
   <script src="backend-config.js"></script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
   <script src="reviewer-core.js"></script>
-  <script src="reviewer.js?v=3"></script>
+  <script src="reviewer.js?v=5"></script>
 </body>
 </html>

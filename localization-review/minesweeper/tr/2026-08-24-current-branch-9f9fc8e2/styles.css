@@ -247,14 +247,32 @@ textarea {
   height: 1px;
 }
 
-#payload {
-  white-space: pre-wrap;
-  background: #0d1a1f;
-  color: #d8f3ea;
-  padding: 10px;
+.submit-status {
   border-radius: 6px;
-  max-height: 220px;
-  overflow: auto;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-top: 8px;
+  padding: 10px;
+}
+
+.submit-status:empty {
+  display: none;
+}
+
+.submit-status.info {
+  background: #edf3f8;
+  color: #1d4a62;
+}
+
+.submit-status.success {
+  background: #e8f6ee;
+  color: #1e6b3f;
+}
+
+.submit-status.error {
+  background: #fff0ee;
+  color: #9f2721;
 }
 
 @media (max-width: 900px) {

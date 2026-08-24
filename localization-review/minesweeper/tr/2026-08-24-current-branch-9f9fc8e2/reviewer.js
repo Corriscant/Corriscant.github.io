@@ -7,6 +7,7 @@
   let turnstileToken = "";
   let backendSessionError = "";
   let markersVisible = true;
+  let submissionComplete = false;
   const humanVerificationRequiredMessage = "Please complete Human verification, then press Submit Review again.";
 
   function loadState() {
@@ -47,7 +48,19 @@
     renderMarkers(screen);
     renderItems(screen, screenState);
     applyImageMode(screen);
-    document.getElementById("payload").textContent = backendSessionError;
+    setSubmitStatus(backendSessionError, backendSessionError ? "error" : "");
+  }
+
+  function setSubmitStatus(message, kind) {
+    const status = document.getElementById("payload");
+    status.textContent = message || "";
+    status.className = "submit-status" + (message && kind ? " " + kind : "");
+  }
+
+  function setSubmitBusy(isBusy) {
+    const button = document.getElementById("submit");
+    button.disabled = isBusy;
+    button.textContent = isBusy ? "Submitting..." : "Submit Review";
   }
 
   function populateScreenJump() {
@@ -168,7 +181,7 @@
       backendSessionError = "";
       saveState();
     } catch (error) {
-      backendSessionError = "Backend session unavailable: " + error.message;
+      backendSessionError = "The review server is unavailable. Please refresh the page and try again.";
     }
   }
 
@@ -194,10 +207,16 @@
   }
 
   async function submitPayload() {
+    if (submissionComplete) {
+      const result = { ok: true, alreadySubmitted: true };
+      setSubmitStatus("Review already submitted. Thank you.", "success");
+      return result;
+    }
+
     if (backendConfig.apiBaseUrl && backendConfig.turnstileSiteKey && !turnstileToken) {
       const error = { error: humanVerificationRequiredMessage };
       setHumanCheckMessage(humanVerificationRequiredMessage);
-      document.getElementById("payload").textContent = JSON.stringify(error, null, 2);
+      setSubmitStatus(humanVerificationRequiredMessage, "error");
       return error;
     }
 
@@ -206,28 +225,43 @@
     });
     const validation = core.validateSubmissionPayload(data, payload);
     if (!validation.valid) {
-      document.getElementById("payload").textContent = JSON.stringify(validation, null, 2);
+      setSubmitStatus("The review could not be prepared. Please refresh the page and try again.", "error");
       return payload;
     }
 
     if (!backendConfig.apiBaseUrl) {
-      document.getElementById("payload").textContent = JSON.stringify(payload, null, 2);
+      setSubmitStatus("Online submission is not configured for this review package. Please contact the project owner.", "error");
       return payload;
     }
 
     if (!state.sessionId) {
-      document.getElementById("payload").textContent = JSON.stringify({ error: "backend session is unavailable" }, null, 2);
+      setSubmitStatus("The review session is not ready. Please refresh the page and try again.", "error");
       return payload;
     }
 
-    const response = await fetch(backendConfig.apiBaseUrl.replace(/\/$/, "") + "/submit", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const body = await response.json();
-    document.getElementById("payload").textContent = JSON.stringify(body, null, 2);
-    return body;
+    setSubmitBusy(true);
+    setSubmitStatus("Submitting review...", "info");
+    try {
+      const response = await fetch(backendConfig.apiBaseUrl.replace(/\/$/, "") + "/submit", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        throw new Error(body.error || "Submission failed");
+      }
+
+      submissionComplete = true;
+      setSubmitStatus("Review submitted. Thank you.", "success");
+      return body;
+    } catch (error) {
+      const message = "Review could not be submitted. Please try again.";
+      setSubmitStatus(message, "error");
+      return { error: message, details: error.message };
+    } finally {
+      setSubmitBusy(false);
+    }
   }
 
   document.getElementById("prev").addEventListener("click", () => { if (index > 0) { index--; resetMarkersForScreenChange(); render(); } });
@@ -283,7 +317,7 @@
       render();
     })
     .catch(error => {
-      document.getElementById("payload").textContent = error.message;
+      setSubmitStatus("The review package could not be loaded. Please refresh the page and try again.", "error");
     });
 
   window.LocalizationReviewKitReviewerApp = {
