@@ -49,6 +49,14 @@ button:disabled {
   cursor: default;
 }
 
+.nav-link {
+  border-radius: 6px;
+  background: #f4f8f5;
+  color: #17201d;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
 #screen-jump {
   border: 0;
   border-radius: 6px;
@@ -273,6 +281,107 @@ textarea {
 .submit-status.error {
   background: #fff0ee;
   color: #9f2721;
+}
+
+.admin-main {
+  display: block;
+  height: auto;
+  min-height: calc(100vh - 58px);
+  padding: 16px;
+}
+
+.admin-panel,
+.admin-card {
+  border: 1px solid #cbd2cd;
+  border-radius: 6px;
+  background: #fff;
+  margin: 0 auto 14px;
+  max-width: 1280px;
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+.admin-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.admin-token-field {
+  align-items: stretch;
+  flex: 1 1 360px;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.admin-token-field span {
+  font-weight: 700;
+}
+
+.admin-token-field input {
+  box-sizing: border-box;
+  min-height: 34px;
+  width: 100%;
+}
+
+.admin-report h1,
+.admin-report h2,
+.admin-report h3 {
+  margin: 0;
+}
+
+.admin-report h1 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.admin-report h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.admin-report h3 {
+  font-size: 14px;
+  margin: 12px 0 6px;
+}
+
+.admin-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-metrics span {
+  border: 1px solid #cbd2cd;
+  border-radius: 6px;
+  background: #f5f6f2;
+  padding: 8px 10px;
+}
+
+.admin-report table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.admin-report th,
+.admin-report td {
+  border: 1px solid #d9dfdb;
+  font-size: 13px;
+  line-height: 1.35;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-report th {
+  background: #eef4f1;
+  font-weight: 700;
+}
+
+.admin-report td {
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 900px) {
