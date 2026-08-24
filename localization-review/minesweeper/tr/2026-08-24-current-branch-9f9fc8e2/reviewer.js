@@ -10,7 +10,7 @@
   let markersVisible = true;
   let submissionInFlight = false;
   let submitCooldownTimerId = 0;
-  const ResubmitCooldownMs = 30000;
+  let resubmitCooldownMs = 30000;
   const humanVerificationRequiredMessage = "Please complete Human verification, then press Submit Review again.";
 
   function loadState() {
@@ -33,6 +33,11 @@
       state.submitCooldownUntilMs = 0;
     }
 
+    if (!Number.isFinite(Number(state.resubmitCooldownMs)) || Number(state.resubmitCooldownMs) <= 0) {
+      state.resubmitCooldownMs = resubmitCooldownMs;
+    }
+
+    resubmitCooldownMs = Number(state.resubmitCooldownMs);
     state.imageMode = core.normalizeImageMode(state.imageMode);
     saveState();
   }
@@ -249,11 +254,22 @@
       }
 
       state.sessionId = body.sessionId;
+      applyBackendCooldown(body.resubmitCooldownSeconds);
       backendSessionError = "";
       saveState();
     } catch (error) {
       backendSessionError = "The review server is unavailable. Please refresh the page and try again.";
     }
+  }
+
+  function applyBackendCooldown(seconds) {
+    const parsedSeconds = Number(seconds);
+    if (!Number.isFinite(parsedSeconds) || parsedSeconds <= 0) {
+      return;
+    }
+
+    resubmitCooldownMs = Math.ceil(parsedSeconds * 1000);
+    state.resubmitCooldownMs = resubmitCooldownMs;
   }
 
   function renderTurnstile() {
@@ -343,8 +359,9 @@
         throw error;
       }
 
-      setSubmitStatus("Review submitted. You can send updates in 30 seconds.", "success");
-      startSubmitCooldown(ResubmitCooldownMs);
+      const cooldownSeconds = Math.ceil(resubmitCooldownMs / 1000);
+      setSubmitStatus("Review submitted. You can send updates in " + cooldownSeconds + " seconds.", "success");
+      startSubmitCooldown(resubmitCooldownMs);
       return body;
     } catch (error) {
       if (Number.isFinite(error.retryAfterSeconds) && error.retryAfterSeconds > 0) {
