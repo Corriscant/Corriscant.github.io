@@ -8,6 +8,7 @@
   let backendSessionError = "";
   let markersVisible = true;
   let submissionComplete = false;
+  let submissionInFlight = false;
   const humanVerificationRequiredMessage = "Please complete Human verification, then press Submit Review again.";
 
   function loadState() {
@@ -213,6 +214,12 @@
       return result;
     }
 
+    if (submissionInFlight) {
+      const result = { ok: false, pending: true };
+      setSubmitStatus("Review submission is already in progress.", "info");
+      return result;
+    }
+
     if (backendConfig.apiBaseUrl && backendConfig.turnstileSiteKey && !turnstileToken) {
       const error = { error: humanVerificationRequiredMessage };
       setHumanCheckMessage(humanVerificationRequiredMessage);
@@ -239,6 +246,7 @@
       return payload;
     }
 
+    submissionInFlight = true;
     setSubmitBusy(true);
     setSubmitStatus("Submitting review...", "info");
     try {
@@ -260,6 +268,7 @@
       setSubmitStatus(message, "error");
       return { error: message, details: error.message };
     } finally {
+      submissionInFlight = false;
       setSubmitBusy(false);
     }
   }
