@@ -5,17 +5,17 @@
   "campaigns": [
     {
       "id": "minesweeper-tr-20260824-current-branch-9f9fc8e2",
-      "packageCampaignId": "current-branch-tr",
+      "packageCampaignId": "minesweeper-tr-20260824-current-branch-9f9fc8e2",
       "locale": "tr",
       "language": "Turkish",
       "publishedDate": "2026-08-24",
       "gameCommit": "9f9fc8e2",
       "status": "draft",
-      "submissionStatus": "backend-pending",
+      "submissionStatus": "backend-ready",
       "screens": 35,
       "reviewItems": 262,
       "path": "tr/2026-08-24-current-branch-9f9fc8e2/",
-      "notes": "First public draft package for Turkish localization review. Static preview is available; submission backend is not configured yet."
+      "notes": "First public draft package for Turkish localization review. Cloudflare Worker/D1 submission backend is configured."
     }
   ]
 }

@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "publicCampaignId": "minesweeper-tr-20260824-current-branch-9f9fc8e2",
-  "packageCampaignId": "current-branch-tr",
+  "packageCampaignId": "minesweeper-tr-20260824-current-branch-9f9fc8e2",
   "locale": "tr",
   "language": "Turkish",
   "status": "draft",
-  "submissionStatus": "backend-pending",
+  "submissionStatus": "backend-ready",
   "source": {
     "gameCommit": "9f9fc8e2"
   },
   "package": {
     "screens": 35,
     "reviewItems": 262,
-    "internalCampaignId": "current-branch-tr"
+    "internalCampaignId": "minesweeper-tr-20260824-current-branch-9f9fc8e2"
   }
 }

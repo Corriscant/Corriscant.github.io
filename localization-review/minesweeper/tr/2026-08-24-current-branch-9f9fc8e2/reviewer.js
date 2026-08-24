@@ -5,6 +5,7 @@
   let index = 0;
   let state = {};
   let turnstileToken = "";
+  let backendSessionError = "";
 
   function loadState() {
     const raw = localStorage.getItem(core.storageKey(data));
@@ -42,7 +43,7 @@
     renderMarkers(screen);
     renderItems(screen, screenState);
     applyImageMode(screen);
-    document.getElementById("payload").textContent = "";
+    document.getElementById("payload").textContent = backendSessionError;
   }
 
   function applyImageMode(screen) {
@@ -114,26 +115,31 @@
   }
 
   async function startBackendSession() {
-    if (!backendConfig.apiBaseUrl) {
+    if (!backendConfig.apiBaseUrl || state.sessionId) {
       return;
     }
 
-    const response = await fetch(backendConfig.apiBaseUrl.replace(/\/$/, "") + "/session/start", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        campaignId: data.campaignId,
-        manifestHash: data.manifestHash,
-        localeCode: data.localeCode
-      })
-    });
-    const body = await response.json();
-    if (!response.ok) {
-      throw new Error(body.error || "Session start failed");
-    }
+    try {
+      const response = await fetch(backendConfig.apiBaseUrl.replace(/\/$/, "") + "/session/start", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          campaignId: data.campaignId,
+          manifestHash: data.manifestHash,
+          localeCode: data.localeCode
+        })
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        throw new Error(body.error || "Session start failed");
+      }
 
-    state.sessionId = body.sessionId;
-    saveState();
+      state.sessionId = body.sessionId;
+      backendSessionError = "";
+      saveState();
+    } catch (error) {
+      backendSessionError = "Backend session unavailable: " + error.message;
+    }
   }
 
   function renderTurnstile() {
@@ -161,6 +167,11 @@
 
     if (!backendConfig.apiBaseUrl) {
       document.getElementById("payload").textContent = JSON.stringify(payload, null, 2);
+      return payload;
+    }
+
+    if (!state.sessionId) {
+      document.getElementById("payload").textContent = JSON.stringify({ error: "backend session is unavailable" }, null, 2);
       return payload;
     }
 
