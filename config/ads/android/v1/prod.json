@@ -1,5 +1,11 @@
 {
-  "revision": 1,
-  "updatedAtUtc": "2026-09-04T10:25:36Z",
-  "provider": "levelplay"
+  "revision": 2,
+  "updatedAtUtc": "2026-09-18T22:28:22Z",
+  "provider": "levelplay",
+  "vip": {
+    "enabled": true,
+    "benefitsRevision": 1,
+    "minPurchaseVersionCode": 44,
+    "minBenefitsVersionCode": 44
+  }
 }
