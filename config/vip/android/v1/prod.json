@@ -1,7 +1,7 @@
 {
-  "revision": 5,
-  "updatedAtUtc": "2026-09-19T14:33:16Z",
-  "enabled": false,
+  "revision": 6,
+  "updatedAtUtc": "2026-09-19T14:36:47Z",
+  "enabled": true,
   "benefitsRevision": 1,
   "minPurchaseVersionCode": 44,
   "minBenefitsVersionCode": 44
