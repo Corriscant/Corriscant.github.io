@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Понятный обзор текущей архитектуры VIP Minesweeper: Google Play, Unity, RTDN, Worker, D1 и удалённая policy.">
+  <title>VIP — архитектура и границы ответственности</title>
+  <style>
+    :root {
+      --ink: #18324a;
+      --muted: #5d748a;
+      --blue: #2f6f9f;
+      --blue-dark: #194d78;
+      --blue-soft: #eaf4fb;
+      --blue-pale: #f6fbff;
+      --line: #c7dceb;
+      --white: #fff;
+      --shadow: 0 10px 28px rgba(28, 83, 120, .10);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f2f8fc 0, #fff 420px);
+      font: 16px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    a { color: var(--blue-dark); }
+    .wrap { width: min(940px, calc(100% - 32px)); margin: 0 auto; }
+    header { padding: 34px 0 24px; }
+    .eyebrow { color: var(--blue); font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    h1, h2 { color: var(--blue-dark); line-height: 1.2; }
+    h1 { margin: 8px 0 12px; font-size: clamp(2rem, 5vw, 3rem); }
+    h2 { margin: 2.8rem 0 1rem; font-size: clamp(1.45rem, 3vw, 2rem); scroll-margin-top: 20px; }
+    h3 { color: var(--blue-dark); margin-top: 1.6rem; }
+    p { margin: 0 0 1rem; }
+    .lede { max-width: 780px; color: #36566f; font-size: 1.08rem; }
+    .meta { color: var(--muted); font-size: .9rem; }
+    nav {
+      margin: 8px 0 28px;
+      padding: 14px 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.82);
+      box-shadow: var(--shadow);
+    }
+    nav strong { display: block; margin-bottom: 5px; color: var(--blue-dark); }
+    nav a { display: inline-block; margin: 3px 16px 3px 0; font-size: .94rem; }
+    .panel {
+      margin: 1.2rem 0;
+      padding: 20px 22px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+    .panel.blue { background: var(--blue-soft); }
+    .diagram { overflow-x: auto; padding: 8px; border-radius: 12px; background: var(--blue-pale); border: 1px solid var(--line); }
+    svg.arch { display: block; min-width: 760px; width: 100%; height: auto; }
+    svg .box { fill: #fff; stroke: #76a8c8; stroke-width: 2; }
+    svg .box.store { fill: #edf7ff; stroke: #3e83b4; }
+    svg .box.server { fill: #e8f2fa; stroke: #285f89; }
+    svg .box.policy { fill: #f2f7ec; stroke: #7b9c67; }
+    svg .box.game { fill: #fff7e8; stroke: #c4933c; }
+    svg text { fill: var(--ink); font-family: system-ui, sans-serif; font-size: 14px; }
+    svg text.small { fill: var(--muted); font-size: 11px; }
+    svg .arrow { fill: none; stroke: #3d789f; stroke-width: 2.5; marker-end: url(#arrow); }
+    svg .dashed { stroke-dasharray: 7 6; }
+    .sequence { display: grid; gap: 8px; margin: 12px 0 4px; }
+    .step { display: grid; grid-template-columns: 46px minmax(130px, 1fr) 26px minmax(160px, 1.5fr); align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .step b { color: var(--blue); }
+    .step .arrow-text { color: var(--blue); font-size: 1.35rem; text-align: center; }
+    .track { margin-top: 14px; padding: 14px 16px; border-left: 4px solid var(--blue); background: var(--blue-soft); border-radius: 0 10px 10px 0; }
+    .table-wrap { overflow-x: auto; margin: 12px 0 18px; border: 1px solid var(--line); border-radius: 12px; }
+    table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
+    th, td { padding: 12px 13px; text-align: left; vertical-align: top; border-bottom: 1px solid #e0edf5; }
+    th { color: var(--blue-dark); background: var(--blue-soft); font-size: .92rem; }
+    tr:last-child td { border-bottom: 0; }
+    code { overflow-wrap: anywhere; padding: .1em .3em; border-radius: 4px; background: #eef4f8; color: #234b68; font-size: .92em; }
+    footer { margin: 3rem 0 4rem; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: .92rem; }
+    footer a { margin-right: 16px; }
+    @media (max-width: 620px) {
+      .wrap { width: min(100% - 22px, 940px); }
+      header { padding-top: 22px; }
+      .panel { padding: 16px; }
+      .step { grid-template-columns: 32px 1fr; gap: 2px 8px; }
+      .step .arrow-text { display: none; }
+      .step span:last-child { grid-column: 2; color: var(--muted); }
+      nav a { margin-right: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="eyebrow">Minesweeper · VIP</div>
+    <h1>Как устроены покупка, право доступа и восстановление</h1>
+    <p class="lede">Понятный обзор для владельца игры. Состояние проверено 19 сентября 2026 года; описана текущая тестовая инфраструктура и клиентский контракт, а не готовность production-релиза.</p>
+    <p class="meta">Обзор текущей реализации · 19.09.2026</p>
+  </header>
+
+  <main class="wrap">
+    <nav aria-label="Оглавление">
+      <strong>Оглавление</strong>
+      <a href="#main">Главное</a>
+      <a href="#roles">Кто за что отвечает</a>
+      <a href="#purchase">Покупка</a>
+      <a href="#policy">Конфигурация и реклама</a>
+      <a href="#failures">Сбои и офлайн</a>
+      <a href="#changes">Что менять где</a>
+      <a href="#limits">Границы</a>
+      <a href="#sources">Источники</a>
+    </nav>
+
+    <section id="main">
+      <h2>Главное</h2>
+      <p><strong>VIP отключает принудительную рекламу и даёт отдельное бесплатное пополнение бонусов по правилам игры.</strong> Добровольная реклама за награду остаётся отдельным механизмом.</p>
+      <p>VIP состоит из трёх связанных, но самостоятельных частей. Google Play принимает оплату и хранит актуальное состояние подписки. Unity-приложение получает это состояние через Unity IAP 5.4.3, сохраняет право VIP (entitlement) локально и применяет игровые преимущества. Отдельный Cloudflare Worker слушает уведомления Google Play, перепроверяет их через Google Play API и ведёт серверный журнал. Worker не является API проверки для игры: в V1 нет вызова Unity → Worker <code>/verify</code>, и D1 не является источником, из которого игра получает право VIP.</p>
+      <p><strong>Термины на схеме:</strong> Worker — наш серверный обработчик в Cloudflare, без отдельного виртуального сервера; D1 — его база данных. RTDN — уведомления Google Play об изменениях подписки; Pub/Sub — сервис Google, который доставляет их нашему обработчику. Удалённая конфигурация (policy) — небольшой JSON-файл с настройками доступности VIP.</p>
+      <p>Уведомление RTDN означает «состояние могло измениться», а не само состояние. Worker принимает его через аутентифицированный Google Cloud Pub/Sub push, заново запрашивает текущую подписку у Google Play, при необходимости подтверждает оплаченную покупку, ещё ожидающую подтверждения разработчиком, затем сохраняет проверенное состояние в D1. В D1 есть текущая проекция подписки и история событий. Это полезно для аудита и повторной обработки; игра напрямую к этим данным не подключена.</p>
+      <p>В клиенте право VIP — локально сохранённое состояние, загруженное через обычное сохранение игры. Успешный определённый ответ магазина может обновить это состояние в обе стороны. Ошибка сети, недоступность магазина или неопределённый ответ не превращаются в отрицательный ответ и не отнимают уже сохранённое право. Локальный кэш не имеет самостоятельного срока истечения: окончательное обновление приходит от успешной проверки магазина.</p>
+      <div class="diagram" role="img" aria-label="Схема взаимодействия игрока, Unity, Google Play, PubSub, Worker, D1 и VIP policy">
+        <svg class="arch" viewBox="0 0 940 515" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto-start-reverse"><path d="M0,0 L0,6 L9,3 z" fill="#3d789f"/></marker></defs>
+<rect class="box policy" x="20" y="35" width="230" height="80" rx="12"/><text x="135" y="66" text-anchor="middle">VIP-конфигурация</text><text class="small" x="135" y="92" text-anchor="middle">JSON на GitHub Pages</text>
+<rect class="box" x="350" y="35" width="230" height="80" rx="12"/><text x="465" y="66" text-anchor="middle">Игра на телефоне</text><text class="small" x="465" y="92" text-anchor="middle">Unity + Unity IAP</text>
+<rect class="box store" x="680" y="35" width="230" height="80" rx="12"/><text x="795" y="66" text-anchor="middle">Google Play</text><text class="small" x="795" y="92" text-anchor="middle">покупки и состояние подписки</text>
+<rect class="box game" x="350" y="215" width="230" height="70" rx="12"/><text x="465" y="244" text-anchor="middle">Сохранение и преимущества</text><text class="small" x="465" y="267" text-anchor="middle">право VIP и игровые правила</text>
+<rect class="box" x="680" y="215" width="230" height="70" rx="12"/><text x="795" y="244" text-anchor="middle">Google Cloud Pub/Sub</text><text class="small" x="795" y="267" text-anchor="middle">доставка уведомлений RTDN</text>
+<rect class="box server" x="680" y="390" width="230" height="80" rx="12"/><text x="795" y="422" text-anchor="middle">Наш сервер: Worker</text><text class="small" x="795" y="446" text-anchor="middle">проверка и подтверждение покупки</text>
+<rect class="box server" x="350" y="390" width="230" height="80" rx="12"/><text x="465" y="422" text-anchor="middle">Наша база: Cloudflare D1</text><text class="small" x="465" y="446" text-anchor="middle">состояние и история событий</text>
+<line class="arrow" x1="250" y1="75" x2="350" y2="75"/><text class="small" x="300" y="61" text-anchor="middle">настройки</text>
+<line class="arrow" style="marker-start:url(#arrow)" x1="580" y1="75" x2="680" y2="75"/><text class="small" x="630" y="55" text-anchor="middle">покупка</text><text class="small" x="630" y="105" text-anchor="middle">проверка / ACK</text>
+<line class="arrow" x1="465" y1="115" x2="465" y2="215"/><text class="small" x="478" y="175">право VIP</text>
+<line class="arrow" x1="755" y1="115" x2="755" y2="215"/><text class="small" x="739" y="175" text-anchor="end">изменения подписки</text>
+<line class="arrow" x1="795" y1="285" x2="795" y2="390"/><text class="small" x="778" y="335" text-anchor="end">защищённая доставка</text>
+<line class="arrow" x1="680" y1="430" x2="580" y2="430"/><text class="small" x="630" y="411" text-anchor="middle">запись</text>
+<path class="arrow dashed" d="M910 430 L926 430 L926 155 L870 155 L870 115"/><text class="small" x="887" y="187" text-anchor="middle">API: проверка / ACK</text>
+<text class="small" x="20" y="485">Игра и сервер независимо обращаются к Google Play. Прямого соединения игры с Worker или D1 нет.</text>
+</svg>
+      </div>
+    </section>
+
+    <section id="roles">
+      <h2>Кто за что отвечает</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Участник</th><th>Роль</th><th>Где находится</th><th>Главный источник</th></tr></thead>
+          <tbody>
+            <tr><td>Unity-клиент</td><td>Покупка, локальное право, UI, реклама и VIP-пополнение</td><td><a href="https://github.com/Corriscant/Minesweeper"><code>Corriscant/Minesweeper</code></a><br><code>C:\UnityProjects\Projects\Minesweeper</code></td><td>Определённый ответ Google Play для локального права; локальный кэш — для работы без сети</td></tr>
+            <tr><td>Unity IAP</td><td>Магазинный адаптер</td><td><code>Assets/Features/InApp/UnityIapVipStore.cs</code></td><td>Состояние Google Play и callbacks покупки/restore</td></tr>
+            <tr><td>Google Play</td><td>Оплата, продление, отмена, истечение и ACK</td><td>Внешний магазин; пакет <code>com.corriscant.minesweeper</code>, продукт <code>vip</code></td><td>Актуальное состояние подписки</td></tr>
+            <tr><td>Billing Worker</td><td>RTDN, повторный запрос Google, серверное подтверждение покупки и журнал</td><td><a href="https://github.com/Corriscant/MinesweeperBackend"><code>Corriscant/MinesweeperBackend</code></a><br><code>minesweeper-vip-billing-test</code></td><td>Только повторно полученное состояние Google Play</td></tr>
+            <tr><td>D1</td><td>Серверная проекция и история обработки</td><td>База <code>minesweeper-vip-billing-test</code><br><code>subscriptions</code> и <code>subscription_events</code></td><td>Аудит backend; не клиентское хранилище права VIP</td></tr>
+            <tr><td>VIP policy</td><td>Доступность новых покупок и совместимость описания</td><td><code>D:\Work\Corriscant.github.io\config\vip\android\v1\prod.json</code><br><a href="https://corriscant.github.io/config/vip/android/v1/prod.json">Открытый endpoint</a></td><td>Свежий валидный JSON с новой revision</td></tr>
+            <tr><td>Старый ads JSON</td><td>Совместимость прежних клиентов рекламы</td><td><code>D:\Work\Corriscant.github.io\config\ads\android\v1\prod.json</code></td><td>Старая конфигурация; VIP-политика читается отдельно</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Удалённый репозиторий backend создан, но исходники на текущем этапе ещё не отправлены туда; рабочая копия и уже развернутый test Worker — разные каналы поставки. На test-инфраструктуре базовые end-to-end сценарии RTDN, повторной проверки Google, подтверждения покупки и записи D1 пройдены. Это подтверждает рабочий путь, но не означает production readiness: для production нужен отдельный цикл ресурсов Cloudflare, учётных данных, Pub/Sub, D1 и полного приёмочного контроля. Endpoint <code>/health</code> test Worker отвечает.</p>
+      <p>Тестовый Worker использует Google project <code>minesweeper-classic-corris</code> и Pub/Sub topic <code>minesweeper-vip-rtdn-test</code>. Уведомление приходит только через аутентифицированный push.</p>
+    </section>
+
+<div class="panel"><h3>Адреса и исходники</h3>
+<ul>
+<li><strong>Игра:</strong> <a href="https://github.com/Corriscant/Minesweeper">приватный репозиторий Minesweeper</a>; локально <code>C:\UnityProjects\Projects\Minesweeper</code>.</li>
+<li><strong>Бэкенд:</strong> <a href="https://github.com/Corriscant/MinesweeperBackend">приватный репозиторий MinesweeperBackend</a>; локально <code>C:\UnityProjects\Projects\MinesweeperBackend</code>. На дату обзора удалённый репозиторий ещё пуст.</li>
+<li><strong>Сервер:</strong> <a href="https://minesweeper-vip-billing-test.corriscant-games.workers.dev/health">проверка состояния Worker</a>. Уведомления принимаются по адресу <code>https://minesweeper-vip-billing-test.corriscant-games.workers.dev/rtdn/google-play</code>. Этот адрес требует служебной аутентификации Google.</li>
+<li><strong>Сайт, конфигурация и этот Docs:</strong> <a href="https://github.com/Corriscant/Corriscant.github.io">репозиторий Corriscant.github.io</a>; локально <code>D:\Work\Corriscant.github.io</code>. Публикация — GitHub Pages, ветка <code>main</code>. Исходники этой страницы — <code>docs/vip/</code>.</li>
+<li><strong>VIP-конфигурация:</strong> <a href="https://corriscant.github.io/config/vip/android/v1/prod.json">prod.json</a> и <a href="https://corriscant.github.io/config/vip/android/v1/staging.json">staging.json</a>. Путь <code>config/vip/android/v1/</code> означает: VIP → платформа Android → версия формата → среда.</li>
+</ul></div>
+    <section id="purchase">
+      <h2>Как проходит покупка</h2>
+      <p>Клиент сначала проверяет, что в текущем сеансе есть действующая VIP-политика и она разрешает новую покупку, затем просит Unity IAP провести месячную подписку напрямую через Google Play. После сообщения магазина об оплаченной покупке приложение сначала надёжно записывает VIP и идентификатор выполненной транзакции в сохранение. После успешной записи вызывается клиентский <code>ConfirmPurchase</code>. Повторное уведомление той же покупки обрабатывается без повторной выдачи права.</p>
+      <p>Ниже показаны два пути: шаги 1–4 выполняет игра, а шаги 5–6 — сервер. Серверный путь работает параллельно и не обязан ждать четвёртого шага.</p>
+      <div class="panel blue" aria-label="Последовательность обычной покупки">
+        <div class="sequence">
+          <div class="step"><b>1</b><span>Игрок</span><span class="arrow-text">→</span><span>Игра: конфигурация разрешает покупку</span></div>
+          <div class="step"><b>2</b><span>Unity IAP</span><span class="arrow-text">→</span><span>Google Play: оформление покупки</span></div>
+          <div class="step"><b>3</b><span>Google Play</span><span class="arrow-text">→</span><span>Игра: покупка оплачена, нужна обработка</span></div>
+          <div class="step"><b>4</b><span>Unity</span><span class="arrow-text">→</span><span>Надёжное сохранение VIP, затем подтверждение Google Play</span></div>
+          <div class="step"><b>5</b><span>Google Play</span><span class="arrow-text">→</span><span>Pub/Sub: уведомление об изменении подписки</span></div>
+          <div class="step"><b>6</b><span>Worker</span><span class="arrow-text">→</span><span>Повторный запрос Google, подтверждение при необходимости, затем D1</span></div>
+        </div>
+      </div>
+      <div class="track"><strong>Покупка вне игры:</strong> Google Play → Pub/Sub → проверка и подтверждение сервером → следующий запуск Unity → прямая проверка магазина → локальный VIP и рабочее VIP-пополнение. Этот сценарий уже проверен на тестовом пути при принудительно остановленной игре.</div>
+      <p><strong>Подтверждение покупки (ACK)</strong> сообщает Google, что разработчик обработал покупку. Это отдельный служебный шаг после оплаты, а не повторное списание денег.</p>
+      <p>Клиентское подтверждение покупки сохранено намеренно как страховка при недоступности или задержке сервера. Серверное подтверждение нужно, чтобы покупка могла быть подтверждена даже при закрытой игре. Это два независимых защитных пути, а не схема «сначала ждать Worker». Клиент не ждёт Worker и не отправляет ему данные покупки; сервер не полагается на запуск игры. Подтверждение покупки Google Play также не равно подтверждению доставки Pub/Sub.</p>
+    </section>
+
+    <section id="policy">
+      <h2>Конфигурация, реклама и запуск</h2>
+      <p>Новый VIP JSON отделён от ads JSON. Он содержит <code>enabled</code>, <code>minPurchaseVersionCode</code>, <code>minBenefitsVersionCode</code>, <code>benefitsRevision</code>, <code>revision</code> и время обновления. Текущий Android baseline — <code>enabled=true</code>, <code>benefitsRevision=1</code>, оба минимальных version code равны 44.</p>
+      <p><code>revision</code> — номер изменения JSON; <code>benefitsRevision</code> — версия набора преимуществ, которую должен понимать клиент. <code>minPurchaseVersionCode</code> ограничивает покупку старыми билдами; <code>minBenefitsVersionCode</code> определяет, насколько актуально их описание. Последние два поля используют внутренний Android versionCode, а не видимый номер вроде 1.0.44.</p>
+      <p>Имя <code>prod.json</code> обозначает канал конфигурации приложения. Оно не превращает отдельный бэкенд с именем <code>test</code> в production-сервис: эти настройки независимы.</p>
+      <p><code>enabled=false</code> и минимальная версия покупки закрывают новые покупки. Минимальная версия преимуществ или неизвестная старому клиенту <code>benefitsRevision</code> могут попросить обновить игру. Эти поля не отзывают уже купленный VIP: сохранённое право и встроенное описание остаются доступны.</p>
+      <p>Тексты и состав преимуществ встроены в клиент; JSON их не переписывает. Если запрос policy временно не удался, клиент продолжает использовать последнюю успешно принятую policy текущего сеанса. Время свежести запускает очередную проверку, но само по себе не отнимает право и не закрывает покупку. Если в сеансе ещё нет принятой policy или новый ответ повреждён и признан недействительным, новая покупка закрывается до валидного документа. Отдельного кэша policy на диске нет, поэтому после полного перезапуска без успешной загрузки покупка снова требует валидной policy.</p>
+      <p>Обновление policy запускается стартом, возвратом из фона, восстановлением сети, периодической проверкой и открытием VIP-окна. Запросы объединяются и ограничиваются паузой. Провайдер рекламы выбирается на запуске и не переинициализируется из-за обновления VIP policy. Старый ads JSON сохраняется для прежних клиентов.</p>
+    </section>
+
+    <section id="failures">
+      <h2>Если что-то недоступно</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ситуация</th><th>Поведение игрока</th><th>Поведение данных</th></tr></thead>
+          <tbody>
+            <tr><td>Оффлайн</td><td>Сохранённый VIP продолжает работать; VIP-пополнение использует локальное состояние.</td><td>Право VIP не обнуляется и не получает локальный срок истечения; проверка ждёт сеть.</td></tr>
+            <tr><td>Worker временно недоступен</td><td>Клиентский путь через Google Play не зависит от прямого вызова Worker; уже выданный VIP не отзывается из-за ошибки сервера.</td><td>RTDN с временной ошибкой повторяется Pub/Sub, а серверный журнал догоняет состояние после восстановления. Это не гарантия вечной доставки; долгий сбой требует ручной проверки.</td></tr>
+            <tr><td>Google Play или Unity IAP недоступны</td><td>Новая покупка и определённая проверка магазина не могут завершиться. Уже сохранённый VIP продолжает работать.</td><td>Неопределённый результат не записывается как отзыв; повторная проверка запускается позже.</td></tr>
+            <tr><td>Связь с policy временно не удалась</td><td>Используется последняя принятая policy текущего сеанса, если она есть; без неё новая покупка закрыта.</td><td>Ошибка транспорта или пустой ответ не стирают прежнее решение. Кэша policy на диске нет.</td></tr>
+            <tr><td>Получен невалидный policy JSON</td><td>Новая покупка закрыта; уже купленный VIP и локальные преимущества сохраняются.</td><td>Свежий, но невалидный документ переводит policy в invalid; право VIP остаётся отдельным.</td></tr>
+            <tr><td>Google дал определённый отрицательный ответ</td><td>После полной проверки клиент может обновить право на отсутствие VIP.</td><td>Неопределённая ошибка этого не делает; отзыв или истечение определяется состоянием магазина.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="changes">
+      <h2>Что менять и где</h2>
+      <p>Разрешение новых покупок или требования к версии клиента меняют в отдельном VIP JSON с новой <code>revision</code> и свежим временем. Тексты и состав преимуществ меняются в Unity-клиенте, потому что JSON их не заменяет. Перед публикацией нужен доступный совместимый клиент. Продукт, период и процесс магазина относятся к Unity IAP и Google Play Console.</p>
+      <p>Право VIP, сохранение, подавление рекламы и VIP-пополнение относятся к Unity <code>VipService</code>, <code>GameSaveService</code>, <code>VipRefillPolicy</code> и <code>UnityIapVipStore</code>. Игровая логика знает только право и возможности пополнения; конкретный SKU и управление подпиской находятся за границей адаптера магазина. RTDN, повторный запрос Google, подтверждение покупки, защита от повторов и D1-аудит меняются в <code>MinesweeperBackend</code>; для этого не нужен новый клиентский <code>/verify</code>.</p>
+    </section>
+
+    <section id="limits">
+      <h2>Текущие границы и открытые вопросы</h2>
+      <p>Backend покрыт интеграционными тестами Worker/D1 и mock-ответами Google; базовые end-to-end сценарии RTDN, повторной проверки Google, подтверждения покупки и записи D1 пройдены на test-ресурсах. Это подтверждает рабочий путь, но test-Worker, test-D1 и связанные учётные данные ещё не следует называть production-ready. Worker называется <code>minesweeper-vip-billing-test</code>.</p>
+      <p>Автоматизация Google Review Refund / chargeback отложена как optional: PendingRefundReview аудируется, а фактический отзыв права определяется новым запросом актуального состояния Google Play и отражается отдельным путём. Сейчас полноценно поддержаны RU и EN; остальные локали остаются долгом.</p>
+    </section>
+
+    <section id="sources">
+      <details>
+        <summary>Технические примечания и исходники</summary>
+        <ul>
+          <li>Backend: <code>README.md</code>, <code>wrangler.jsonc</code>, <code>src/auth.ts</code>, <code>src/rtdn.ts</code>, <code>src/google-play.ts</code>, <code>src/processor.ts</code>, <code>src/db.ts</code>, <code>migrations/0001_initial.sql</code>.</li>
+          <li>Unity: <code>VIP_Next_Chat_Handoff_2026-09-19.md</code>, <code>VIP_Store_Recovery_Coordination_2026-09-19.md</code>, актуальные <code>VipService.cs</code>, <code>UnityIapVipStore.cs</code>, <code>VipRemotePolicy.cs</code>, <code>VipConfig.asset</code> и <code>BillingMode.json</code>.</li>
+          <li>Конфигурация: <a href="https://corriscant.github.io/config/vip/android/v1/prod.json"><code>config/vip/android/v1/prod.json</code></a>; baseline revision 10 на дату обзора.</li>
+          <li>Репозитории: <a href="https://github.com/Corriscant/Minesweeper"><code>Corriscant/Minesweeper</code></a> и <a href="https://github.com/Corriscant/MinesweeperBackend"><code>Corriscant/MinesweeperBackend</code></a>. Credentials не включены; исходники backend пока остаются в локальной рабочей копии.</li>
+          <li>Состав backend, текущий URL Worker и baseline policy следует перепроверить перед production-релизом. Отложенный Review Refund, реальные возвраты и дополнительные локали не входят в текущий ACK-контракт; фактический отзыв права определяется новым запросом состояния Google Play.</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p>Доступ по прямой ссылке. Страница не связана с главной и содержит запрет индексации, но не защищена паролем.</p>
+    <a href="../index.html">← Назад</a>
+    <a href="architecture.ru.md">Исходник: architecture.ru.md</a>
+  </footer>
+</body>
+</html>
