@@ -157,14 +157,14 @@
           </tbody>
         </table>
       </div>
-      <p>Удалённый репозиторий backend создан, но исходники на текущем этапе ещё не отправлены туда; рабочая копия и уже развернутый test Worker — разные каналы поставки. На test-инфраструктуре базовые end-to-end сценарии RTDN, повторной проверки Google, подтверждения покупки и записи D1 пройдены. Это подтверждает рабочий путь, но не означает production readiness: для production нужен отдельный цикл ресурсов Cloudflare, учётных данных, Pub/Sub, D1 и полного приёмочного контроля. Endpoint <code>/health</code> test Worker отвечает.</p>
+      <p>Исходники backend и вся история коммитов сохранены в приватном репозитории GitHub. Ветки main и codex/2026-09-18-vip-billing опубликованы 19 сентября 2026 года на коммите fb9dd8c. Отправка кода в GitHub и развёртывание Worker в Cloudflare — отдельные действия; push сам по себе не обновляет работающий сервер. На test-инфраструктуре базовые end-to-end сценарии RTDN, повторной проверки Google, подтверждения покупки и записи D1 пройдены. Это подтверждает рабочий путь, но не означает production readiness: для production нужен отдельный цикл ресурсов Cloudflare, учётных данных, Pub/Sub, D1 и полного приёмочного контроля. Endpoint <code>/health</code> test Worker отвечает.</p>
       <p>Тестовый Worker использует Google project <code>minesweeper-classic-corris</code> и Pub/Sub topic <code>minesweeper-vip-rtdn-test</code>. Уведомление приходит только через аутентифицированный push.</p>
     </section>
 
 <div class="panel"><h3>Адреса и исходники</h3>
 <ul>
 <li><strong>Игра:</strong> <a href="https://github.com/Corriscant/Minesweeper">приватный репозиторий Minesweeper</a>; локально <code>C:\UnityProjects\Projects\Minesweeper</code>.</li>
-<li><strong>Бэкенд:</strong> <a href="https://github.com/Corriscant/MinesweeperBackend">приватный репозиторий MinesweeperBackend</a>; локально <code>C:\UnityProjects\Projects\MinesweeperBackend</code>. На дату обзора удалённый репозиторий ещё пуст.</li>
+<li><strong>Бэкенд:</strong> <a href="https://github.com/Corriscant/MinesweeperBackend">приватный репозиторий MinesweeperBackend</a>; локально <code>C:\UnityProjects\Projects\MinesweeperBackend</code>. Код опубликован в GitHub; основная ветка — <code>main</code>.</li>
 <li><strong>Сервер:</strong> <a href="https://minesweeper-vip-billing-test.corriscant-games.workers.dev/health">проверка состояния Worker</a>. Уведомления принимаются по адресу <code>https://minesweeper-vip-billing-test.corriscant-games.workers.dev/rtdn/google-play</code>. Этот адрес требует служебной аутентификации Google.</li>
 <li><strong>Сайт, конфигурация и этот Docs:</strong> <a href="https://github.com/Corriscant/Corriscant.github.io">репозиторий Corriscant.github.io</a>; локально <code>D:\Work\Corriscant.github.io</code>. Публикация — GitHub Pages, ветка <code>main</code>. Исходники этой страницы — <code>docs/vip/</code>.</li>
 <li><strong>VIP-конфигурация:</strong> <a href="https://corriscant.github.io/config/vip/android/v1/prod.json">prod.json</a> и <a href="https://corriscant.github.io/config/vip/android/v1/staging.json">staging.json</a>. Путь <code>config/vip/android/v1/</code> означает: VIP → платформа Android → версия формата → среда.</li>
@@ -234,7 +234,7 @@
           <li>Backend: <code>README.md</code>, <code>wrangler.jsonc</code>, <code>src/auth.ts</code>, <code>src/rtdn.ts</code>, <code>src/google-play.ts</code>, <code>src/processor.ts</code>, <code>src/db.ts</code>, <code>migrations/0001_initial.sql</code>.</li>
           <li>Unity: <code>VIP_Next_Chat_Handoff_2026-09-19.md</code>, <code>VIP_Store_Recovery_Coordination_2026-09-19.md</code>, актуальные <code>VipService.cs</code>, <code>UnityIapVipStore.cs</code>, <code>VipRemotePolicy.cs</code>, <code>VipConfig.asset</code> и <code>BillingMode.json</code>.</li>
           <li>Конфигурация: <a href="https://corriscant.github.io/config/vip/android/v1/prod.json"><code>config/vip/android/v1/prod.json</code></a>; baseline revision 10 на дату обзора.</li>
-          <li>Репозитории: <a href="https://github.com/Corriscant/Minesweeper"><code>Corriscant/Minesweeper</code></a> и <a href="https://github.com/Corriscant/MinesweeperBackend"><code>Corriscant/MinesweeperBackend</code></a>. Credentials не включены; исходники backend пока остаются в локальной рабочей копии.</li>
+          <li>Репозитории: <a href="https://github.com/Corriscant/Minesweeper"><code>Corriscant/Minesweeper</code></a> и <a href="https://github.com/Corriscant/MinesweeperBackend"><code>Corriscant/MinesweeperBackend</code></a>. Секреты не включены; исходники backend опубликованы в приватном репозитории.</li>
           <li>Состав backend, текущий URL Worker и baseline policy следует перепроверить перед production-релизом. Отложенный Review Refund, реальные возвраты и дополнительные локали не входят в текущий ACK-контракт; фактический отзыв права определяется новым запросом состояния Google Play.</li>
         </ul>
       </details>
