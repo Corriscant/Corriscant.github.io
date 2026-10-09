@@ -384,6 +384,23 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+@media (min-width: 901px) {
+  body.reviewer-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  body.reviewer-page > header {
+    flex-shrink: 0;
+  }
+
+  body.reviewer-page > main {
+    flex: 1;
+    height: auto;
+  }
+}
+
 @media (max-width: 900px) {
   header {
     align-items: flex-start;

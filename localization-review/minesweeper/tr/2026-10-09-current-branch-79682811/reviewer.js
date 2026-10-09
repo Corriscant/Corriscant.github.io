@@ -451,26 +451,9 @@
     .then(response => response.json())
     .then(async json => {
       data = json;
-      const requested = data.requestedStates || [];
-      const completeness = document.getElementById("capture-completeness");
-      if (requested.length && completeness) {
-        completeness.hidden = false;
-        const captured = requested.filter(state => state.status === "captured").length;
-        const limitations = requested.reduce((count, state) => count + (state.limitations || []).length, 0);
-        const complete = captured === requested.length && limitations === 0 && requested.every(state => state.indexedLabels > 0);
-        document.getElementById("capture-summary").textContent = "Capture " + (complete ? "complete: " : "incomplete: ") + captured + "/" + requested.length +
-          " requested states; " + limitations + " limitations. Expand for scope and missing results.";
-        const list = document.getElementById("capture-state-list");
-        requested.forEach(state => {
-          const row = document.createElement("li");
-          row.textContent = state.id + ": " + state.status + "; indexed labels: " + state.indexedLabels +
-            ((state.limitations || []).length ? "; " + state.limitations.join(" | ") : "");
-          list.appendChild(row);
-        });
-      }
       if (!data.screens || !data.screens.length) {
         document.getElementById("screen-title").textContent = "No captured screens";
-        setSubmitStatus("This run has no reviewable screenshots. See capture scope above.", "error");
+        setSubmitStatus("This review package has no screenshots.", "error");
         document.getElementById("submit").disabled = true;
         return;
       }
