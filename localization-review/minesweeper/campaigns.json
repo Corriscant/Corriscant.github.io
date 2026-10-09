@@ -32,6 +32,21 @@
       "path": "ru/2026-08-25-current-branch-63a59d21/",
       "adminPath": "ru/2026-08-25-current-branch-63a59d21/admin.html",
       "notes": "First public draft package for Russian localization review. Cloudflare Worker/D1 submission backend is configured."
+    },
+    {
+      "id": "minesweeper-tr-20261009-current-branch-79682811",
+      "packageCampaignId": "live-qa-vip-live-a29eda8c66dc4a53-tr",
+      "locale": "tr",
+      "language": "Turkish",
+      "publishedDate": "2026-10-09",
+      "gameCommit": "79682811",
+      "status": "draft",
+      "submissionStatus": "backend-ready",
+      "screens": 96,
+      "reviewItems": 895,
+      "path": "tr/2026-10-09-current-branch-79682811/",
+      "adminPath": "tr/2026-10-09-current-branch-79682811/admin.html",
+      "notes": "Fresh current-branch Turkish review package. D1 registration is complete; awaiting native Turkish reviewer feedback."
     }
   ]
 }

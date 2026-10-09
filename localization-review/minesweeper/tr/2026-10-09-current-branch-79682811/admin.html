@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Localization Review Results</title>
+  <link rel="stylesheet" href="styles.css?v=4">
+</head>
+<body class="admin-page">
+  <header>
+    <div>
+      <strong id="admin-campaign">Localization Review Results</strong>
+      <span id="admin-summary"></span>
+    </div>
+    <nav>
+      <a class="nav-link" href="index.html">Review page</a>
+    </nav>
+  </header>
+  <main class="admin-main">
+    <section class="admin-panel">
+      <div class="admin-controls">
+        <label class="admin-token-field"><span>Admin token</span><input id="admin-token" type="password" autocomplete="off"></label>
+        <button id="load-results" type="button">Load Results</button>
+        <button id="download-export" type="button" disabled>Download JSON</button>
+      </div>
+      <div id="admin-status" class="submit-status" role="status"></div>
+    </section>
+    <section id="admin-report" class="admin-report"></section>
+  </main>
+  <script src="backend-config.js"></script>
+  <script src="admin-report-core.js?v=1"></script>
+  <script src="admin-report.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "publicCampaignId": "minesweeper-tr-20261009-current-branch-79682811",
+  "packageCampaignId": "live-qa-vip-live-a29eda8c66dc4a53-tr",
+  "locale": "tr",
+  "language": "Turkish",
+  "status": "draft",
+  "submissionStatus": "backend-ready",
+  "source": {
+    "gameCommit": "79682811"
+  },
+  "package": {
+    "screens": 96,
+    "reviewItems": 895,
+    "internalCampaignId": "live-qa-vip-live-a29eda8c66dc4a53-tr"
+  }
+}
