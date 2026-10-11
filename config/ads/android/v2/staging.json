@@ -1,6 +1,6 @@
 {
-  "revision": 33,
-  "updatedAtUtc": "2026-10-11T12:48:42Z",
+  "revision": 34,
+  "updatedAtUtc": "2026-10-11T12:52:03Z",
   "provider": "levelplay",
-  "consentProvider": "inmobi_choice"
+  "consentProvider": "google_ump"
 }
