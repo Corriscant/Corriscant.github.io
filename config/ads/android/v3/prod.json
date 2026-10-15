@@ -1,0 +1,26 @@
+{
+  "revision": 1,
+  "updatedAtUtc": "2026-10-16T00:00:00Z",
+  "provider": "admob",
+  "consentProvider": "google_ump",
+  "countryGroups": [
+    {
+      "id": "regional_lp",
+      "countries": [
+        "RU",
+        "BY",
+        "IR",
+        "CU"
+      ],
+      "provider": "levelplay"
+    }
+  ],
+  "geo": {
+    "cacheTtlSeconds": 86400,
+    "timeoutMs": 1500,
+    "services": [
+      "country_is",
+      "sypex"
+    ]
+  }
+}

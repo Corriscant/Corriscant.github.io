@@ -78,7 +78,7 @@
   <main class="page">
     <section class="card">
       <h1>Privacy Policy</h1>
-      <p class="muted">Last updated: September 4, 2026</p>
+      <p class="muted">Last updated: October 16, 2026</p>
 
       <p>This Privacy Policy applies to the following mobile games, apps, and developer tools:</p>
       <ul>
@@ -103,12 +103,34 @@
       <h2>Consent</h2>
       <p>
         Minesweeper: Level Rush may show an advertising privacy or consent form through Google User Messaging
-        Platform for direct AdMob configurations or through InMobi Choice CMP for the current LevelPlay
-        configuration. The current InMobi configuration may display the form worldwide. These tools may store
+        Platform with either Direct AdMob or Unity LevelPlay, or through InMobi Choice CMP with Unity LevelPlay,
+        depending on the current configuration. The same configured consent provider applies across country
+        groups. These tools may store
         and communicate the user's privacy choices to supported advertising services so ads can be requested,
         served, measured, and limited according to the applicable choice. Users may be able to review or change
         advertising privacy choices later from Privacy options in the app Settings, where available. Declining
         consent or changing choices may limit personalized advertising, but does not necessarily remove all ads.
+      </p>
+
+      <h2>Country-based advertising configuration</h2>
+      <p>
+        When country-based configuration is enabled, Minesweeper: Level Rush makes HTTPS requests to
+        <a href="https://country.is/" target="_blank" rel="noopener noreferrer">country.is</a> and
+        <a href="https://sypexgeo.net/ru/api/" target="_blank" rel="noopener noreferrer">Sypex Geo</a>
+        to determine the connection's country from its public IP address. These requests occur before the
+        advertising consent flow to select an advertising provider. Each contacted service receives the
+        connection's IP address and handles requests under its own policies. Requests may start in parallel;
+        cancelling a pending request does not undo a request already sent.
+      </p>
+      <p>
+        The game uses only the returned country code for this selection; it does not request GPS location or
+        use SIM or language settings to infer country. The game does not save the IP address or full GeoIP
+        response. It caches the country code, service identifier and successful lookup time locally, normally
+        for up to 24 hours of reuse. A remote test configuration can request a fresh lookup at each cold start.
+        Failed lookup time and a short result code are also stored locally to limit retries. If country cannot
+        be determined, the configured default advertising provider is used. Where analytics collection is
+        enabled, country code and sanitized selection/lookup results may be reported through Firebase
+        Analytics. Existing advertising consent and analytics collection controls continue to apply.
       </p>
 
       <h2>Data</h2>
