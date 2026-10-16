@@ -1,26 +1,33 @@
 {
-  "revision": 2,
-  "updatedAtUtc": "2026-10-16T07:07:58Z",
-  "provider": "admob",
-  "consentProvider": "google_ump",
-  "countryGroups": [
-    {
-      "id": "regional_lp",
-      "countries": [
-        "RU",
-        "BY",
-        "IR",
-        "CU"
-      ],
-      "provider": "levelplay"
-    }
-  ],
-  "geo": {
-    "cacheTtlSeconds": 0,
-    "timeoutMs": 1500,
-    "services": [
-      "country_is",
-      "sypex"
-    ]
-  }
+    "revision":  3,
+    "updatedAtUtc":  "2026-10-16T08:11:40Z",
+    "provider":  "admob",
+    "consentProvider":  "google_ump",
+    "countryGroups":  [
+                          {
+                              "id":  "qa_nl_lp",
+                              "countries":  [
+                                                "NL"
+                                            ],
+                              "provider":  "levelplay"
+                          },
+                          {
+                              "id":  "regional_lp",
+                              "countries":  [
+                                                "RU",
+                                                "BY",
+                                                "IR",
+                                                "CU"
+                                            ],
+                              "provider":  "levelplay"
+                          }
+                      ],
+    "geo":  {
+                "cacheTtlSeconds":  0,
+                "timeoutMs":  1500,
+                "services":  [
+                                 "country_is",
+                                 "sypex"
+                             ]
+            }
 }
