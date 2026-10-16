@@ -1,16 +1,9 @@
 {
-    "revision":  3,
-    "updatedAtUtc":  "2026-10-16T08:11:40Z",
+    "revision":  4,
+    "updatedAtUtc":  "2026-10-16T08:17:10Z",
     "provider":  "admob",
     "consentProvider":  "google_ump",
     "countryGroups":  [
-                          {
-                              "id":  "qa_nl_lp",
-                              "countries":  [
-                                                "NL"
-                                            ],
-                              "provider":  "levelplay"
-                          },
                           {
                               "id":  "regional_lp",
                               "countries":  [
