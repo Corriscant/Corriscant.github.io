@@ -1,6 +1,6 @@
 {
-  "revision": 1,
-  "updatedAtUtc": "2026-10-16T00:00:00Z",
+  "revision": 2,
+  "updatedAtUtc": "2026-10-16T07:07:58Z",
   "provider": "admob",
   "consentProvider": "google_ump",
   "countryGroups": [
@@ -16,7 +16,7 @@
     }
   ],
   "geo": {
-    "cacheTtlSeconds": 86400,
+    "cacheTtlSeconds": 0,
     "timeoutMs": 1500,
     "services": [
       "country_is",
