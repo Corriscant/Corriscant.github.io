@@ -71,9 +71,27 @@
       background: #3a3a3a;
     }
 
+    .catalog-listings {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+    }
+
     .pixelpicked {
       display: inline-block;
+      max-width: 100%;
       line-height: 0;
+    }
+
+    .pixelpicked img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .appbrain-app {
+      max-width: 100%;
+      color-scheme: light;
     }
 
     footer {
@@ -117,10 +135,15 @@
         <a class="button" href="https://play.google.com/store/apps/details?id=com.corriscant.minesweeper" target="_blank" rel="noopener">Google Play</a>
       </div>
 
-      <a class="pixelpicked" href="https://pixelpicked.com/game/4neaS2Jr6Ur/minesweeper-level-rush/" target="_blank" rel="noopener">
-        <img src="https://api.pixelpicked.com/api/badges/4neaS2Jr6Ur/live.png?theme=dark"
-             width="250" height="54" alt="Approved on PixelPicked" />
-      </a>
+      <div class="catalog-listings">
+        <a class="pixelpicked" href="https://pixelpicked.com/game/4neaS2Jr6Ur/minesweeper-level-rush/" target="_blank" rel="noopener">
+          <img src="https://api.pixelpicked.com/api/badges/4neaS2Jr6Ur/live.png?theme=dark"
+               width="250" height="54" alt="Approved on PixelPicked" />
+        </a>
+        <div class="appbrain-app">
+          <a href="https://www.appbrain.com/app/minesweeper-level-rush/com.corriscant.minesweeper">Minesweeper: Level Rush on AppBrain</a>
+        </div>
+      </div>
     </section>
 
     <footer>
@@ -132,5 +155,6 @@
       </ul>
     </footer>
   </main>
+  <script type="module" src="https://www.appbrain.com/widgets/app.js"></script>
 </body>
 </html>
